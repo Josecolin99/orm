@@ -219,4 +219,26 @@ Edad = models.IntegerField()
 asdfa = models.DateTimeField(auto_now=False, auto_now_add=False)
 
 
+#Acceder a una vista que se cree en la bd directamente (NO SE CREA EN DJANGO)
+# select ap.id as idpadre, ap.nombre as nombrepadre, ah.id as idhijo, ah.nombre as nombrehijo from  app1_padre  ap inner join app1_hijo ah on ap.id = ah.padre_id
+class ViewPadreHijo(models.Model):
+    idpadre = models.IntegerField(primary_key=True)
+    nombrepadre = models.CharField(max_length=50)
+    idhijo = models.IntegerField()
+    nombrehijo = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'{self.nombrepadre} -> {self.nombrehijo}'
     
+    class Meta:
+        managed = False
+        db_table = "view_padrehijo"
+        
+
+# Personalizar nombre de la tabla que se crea en Django
+class NuevoNombre(models.Model):
+    nombre = models.CharField(max_length=50)
+    
+    class Meta:
+        db_table = "nuevo_nombre"
+        
