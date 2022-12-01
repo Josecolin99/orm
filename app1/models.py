@@ -191,3 +191,32 @@ publicacion.articulo_set.all()
 y desde aqui tambien se pueden agregar relaciones
 """
 
+class Empleado(models.Model):
+    nombre = models.CharField(max_length=100)
+    supervisor = models.ForeignKey(
+        'self',  #Colocando self se puede hacer una llave foranea a si misma
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    
+    def __str__(self):
+        return self.nombre
+
+
+class Employe(models.Model):
+    nombre = models.CharField(max_length=100)
+    supervisor = models.ForeignKey(
+        'app1.Employe',  #Es  otra manera de referenciar asi mismo
+        null=True,
+        on_delete=models.DO_NOTHING
+    )
+    
+    def __str__(self):
+        return self.nombre
+    
+hola = models.BooleanField()
+Edad = models.IntegerField()
+asdfa = models.DateTimeField(auto_now=False, auto_now_add=False)
+
+
+    
