@@ -1,5 +1,6 @@
 from datetime import date
 from django.db import models
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -156,13 +157,17 @@ class Hijo(models.Model):
     def __str__(self):
         return f'{self.nombre} hijo de {self.padre}'
     
-
+# SLUG REVISAR MAS A FONDO NO QUEDO CLARO
 class Publicacion(models.Model):
     titulo = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=60, default='')
     
     def __str__(self):
         return f'{self.titulo}'
-
+    
+    def save(self):
+        self.slug = slugify(self.titulo)
+        super(Publicacion, self).save()
 
 class Articulo(models.Model):
     titular = models.CharField(max_length=100)
@@ -238,7 +243,15 @@ class ViewPadreHijo(models.Model):
 # Personalizar nombre de la tabla que se crea en Django
 class NuevoNombre(models.Model):
     nombre = models.CharField(max_length=50)
-    
+    a = models.CharField(
+        max_length=50,
+        db_column="otro_nombre", #Con esto se puede especificar el nombre que queremos que tebnga en la bd
+        default=""
+        )
+        
     class Meta:
         db_table = "nuevo_nombre"
-        
+
+
+#null=True permite que se cree en null
+#blank=True Especifica que en el formulario no es necesario
