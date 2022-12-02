@@ -44,6 +44,24 @@ class Categoria(ModeloAuditoria):
         verbose_name_plural = 'Categorias'
         
 
+class SubCategoria(ModeloAuditoria):
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    descripcion = models.CharField(
+        max_length=50,
+        help_text='Descripcion de la subcategoria'
+        )
+    
+    def __str__(self):
+        return f'{self.categoria.descripcion}: {self.descripcion}'
+    
+    def save(self):
+        self.descripcion = self.descripcion.upper()
+        super(SubCategoria, self).save()
+    
+    class Meta:
+        verbose_name_plural = 'Sub Categorias'
+        unique_together = ('categoria', 'descripcion')
+
 class Persona(ModeloAuditoria):
     nombre = models.CharField(
         max_length = 50
@@ -219,10 +237,6 @@ class Employe(models.Model):
     def __str__(self):
         return self.nombre
     
-hola = models.BooleanField()
-Edad = models.IntegerField()
-asdfa = models.DateTimeField(auto_now=False, auto_now_add=False)
-
 
 #Acceder a una vista que se cree en la bd directamente (NO SE CREA EN DJANGO)
 # select ap.id as idpadre, ap.nombre as nombrepadre, ah.id as idhijo, ah.nombre as nombrehijo from  app1_padre  ap inner join app1_hijo ah on ap.id = ah.padre_id
@@ -255,3 +269,10 @@ class NuevoNombre(models.Model):
 
 #null=True permite que se cree en null
 #blank=True Especifica que en el formulario no es necesario
+
+"""
+Notas
+
+qs = Categoria.objects.filter( Q(descripcion__startswith='I') | Q(descripcion__startswith='R') ) consultas OR
+
+"""
