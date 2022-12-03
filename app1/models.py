@@ -36,7 +36,7 @@ class Categoria(ModeloAuditoria):
     def __str__(self):
         return self.descripcion
     
-    def save(self):
+    def save(self, *args, **kwargs): #<- Mega importante los arg y kwargs
         self.descripcion = self.descripcion.upper()
         super(Categoria, self).save()
         
@@ -54,7 +54,7 @@ class SubCategoria(ModeloAuditoria):
     def __str__(self):
         return f'{self.categoria.descripcion}: {self.descripcion}'
     
-    def save(self):
+    def save(self, *args, **kwargs):
         self.descripcion = self.descripcion.upper()
         super(SubCategoria, self).save()
     
@@ -84,7 +84,7 @@ class Persona(ModeloAuditoria):
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
     
-    def save(self):
+    def save(self, *args, **kwargs):
         self.nombre = self.nombre.capitalize()
         self.apellido = self.apellido.capitalize()
         super(Persona, self).save()
@@ -100,7 +100,7 @@ class Animal(ModeloAuditoria):
     def __str__(self):
         return self.nombre
     
-    def save(self):
+    def save(self, *args, **kwargs):
         self.nombre = self.nombre.upper()
         super(Animal, self).save()
     
@@ -135,7 +135,7 @@ class Libros(ModeloAuditoria):
         return f'{self.nombre} {self.tipo}'
     
     
-    def save(self):
+    def save(self, *args, **kwargs):
         self.nombre = self.nombre.upper()
         return super(Libros, self).save()
     
@@ -183,7 +183,7 @@ class Publicacion(models.Model):
     def __str__(self):
         return f'{self.titulo}'
     
-    def save(self):
+    def save(self, *args, **kwargs):
         self.slug = slugify(self.titulo)
         super(Publicacion, self).save()
 
@@ -276,3 +276,27 @@ Notas
 qs = Categoria.objects.filter( Q(descripcion__startswith='I') | Q(descripcion__startswith='R') ) consultas OR
 
 """
+class UnicaException(Exception):
+    
+    def __init__(self, pk, nombre, mensaje=None):
+        if mensaje is None:
+            mensaje = f'Este modelo solo acepta un registro, actualmente el registro es id {pk} nombre {nombre}'
+        super(UnicaException, self).__init__(mensaje)
+    
+
+#SOLO UN CAMPO POR TABLA
+
+class Unico(models.Model):
+    nombre = models.CharField(max_length=50)
+    
+    def save(self, *args, **kwargs):
+        if self.__class__.objects.count() and self.pk != self.__class__.objects.first().pk:
+            raise UnicaException(pk = self.__class__.objects.first().pk, nombre=self.__class__.objects.first().nombre)
+            self.pk = self.__class__.first().pk
+        super().save(*args, **kwargs)
+    
+    @classmethod
+    def truncate(cls):
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute(f'TRUNCATE TABLE "{cls._meta.db_table}" CASCADE')
