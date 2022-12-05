@@ -300,3 +300,17 @@ class Unico(models.Model):
         from django.db import connection
         with connection.cursor() as cursor:
             cursor.execute(f'TRUNCATE TABLE "{cls._meta.db_table}" CASCADE')
+            
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+
+@receiver(post_save, sender=Categoria)
+def categoria_saved(sender, **kwargs):
+    print(f'Categoria Guardada sender = {sender}, kwargs={kwargs}')
+    categoria = kwargs['instance']
+    print(categoria.id)
+    
+@receiver(post_delete, sender=Categoria)
+def categoria_deleted(sender, **kwargs):
+    print(f'Categoria borrada sender = {sender}, kwargs={kwargs}')
