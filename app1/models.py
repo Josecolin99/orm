@@ -69,7 +69,6 @@ class Persona(ModeloAuditoria):
     apellido = models.CharField(max_length=50)
     fecha_nacimiento = models.DateField(null=False, blank=False)
    
-   
     @property 
     def edad(self):
         today = date.today()
